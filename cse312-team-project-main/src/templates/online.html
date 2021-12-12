@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <nav class="home-menu">
+        <a href="../home">Home</a>
+    </nav>
+
+    <h2>Online Users</h2>
+    {% for user in online %}
+        <h3>{{ user }}</h3>
+        {% if user != session["username"] %}
+            <form action="/chat/{{ user }}">
+            <input type="submit" value="Chat with this user!">
+            </form>
+        {% endif %}
+    {% endfor %}
+
+    <h2>Offline Users</h2>
+    {% for user in offline %}
+        <h3>{{ user }}</h3>
+    {% endfor %}
+
+<script src="https://cdn.socket.io/4.0.1/socket.io.min.js"
+integrity="sha384-LzhRnpGmQP+lOvWruF/lgkcqD+WDVt9fU3H4BWmwP5u5LTmkUGafMcpZKNObVMLU"
+crossorigin="anonymous"></script>
+
+<script>
+    var socket = io.connect();
+    socket.on('connect', function() {
+            socket.emit('join', {
+                user: "{{ session['username'] }}",
+                room: "{{ session['id'] }}"
+            });
+        });
+
+    socket.on('notif', function(data) {
+                const redirect = confirm("Recived Message from " + data.sender + ": " +
+                                            "'" + data.message + "'" + " Would you like to respond?");
+                if (redirect) {
+                    location.href = `/chat/${data.redirect}/`
+                }
+            });
+    socket.on('joined', function(data) {
+        console.log(data.sender + " " + data.message);
+    });
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Postify</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body style="background-color: {{ session["theme"] }}">
+
+{% if session["logged_in"] %}
+<h2>Username: {{ session["username"] }}</h2>
+{% endif %}
+
+{% block content %}
+
+{% endblock %}
+
+</body>
+</html>

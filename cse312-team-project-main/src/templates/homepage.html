@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"
+            integrity="sha384-LzhRnpGmQP+lOvWruF/lgkcqD+WDVt9fU3H4BWmwP5u5LTmkUGafMcpZKNObVMLU"
+            crossorigin="anonymous"></script>
+
+    <nav class="home-menu">
+        <h1>Welcome to Postify!</h1>
+        <a href="/auth/logout">Logout</a>
+        <a href="online">Online Users & DMs</a>
+        <a href="/change-theme">Change Theme</a>
+        <a href="/blog/create">Post</a>
+    </nav>
+
+    <div>
+        {% if content %}
+            <h2>Create a Post for it to appear here!</h2>
+            <h2>My Posts</h2>
+            {% for post in content %}
+                <div class="post">
+                    <h3>{{ post['title'] }}</h3>
+                    <p>{{ post['body'] }}</p>
+                    {% if post['picture'] %}
+                        <img src="{{ post['picture'] }}" alt="self" style="width:35%;height:35%;" class="center">
+                    {% endif %}
+                    <nav class="home-menu">
+                        {% if session["username"] == post['user'] %}
+                            <a href="/blog/edit/{{post['idno']}}">Edit Post</a>
+                        {% endif %}
+                        <div id= "{{ post['idno'] }}l">
+                            <p>Likes:{{ post['likes'] }}</p>
+                        </div>
+                        <button id = "{{ post['idno'] }}b">Like</button>
+
+                        <script>
+                            console.log("it was here");
+                           var button = document.getElementById("{{ post['idno'] }}b");
+
+                                // sending a connect request to the server.
+                                var socket = io.connect();
+                            console.log(' {{ post['idno'] }}+b');
+                           button.onclick=function(){
+                                   var id = "{{ post['idno'] }}";
+                                   var like = "{{ post['likes'] }}";
+                                   console.log("it was here");
+                                   socket.emit('like event', {
+                                       data: like,
+                                       _id: id
+                                   })
+                                };
+                        </script>
+                    </nav>
+                </div>
+                <br>
+            {% endfor%}
+
+        {% else %}
+            <h2>Create a Post for it to appear here!</h2>
+        {% endif %}
+
+    </div>
+
+    <script>
+        var socket = io.connect();
+        socket.on('from server',function(msg){
+            var div_replace = document.getElementById(msg._id+'l');
+            console.log(div_replace);
+            console.log(msg.data);
+            console.log(msg._id);
+            div_replace.innerHTML = 'Likes:'+msg.data
+        });
+
+        socket.on('connect', function() {
+            socket.emit('join', {
+                user: "{{ session['username'] }}",
+                room: "{{ session['id'] }}"
+            });
+        });
+
+        socket.on('notif', function(data) {
+            console.log('redirection request')
+            const redirect = confirm("Recived Message from " + data.sender + ": " +
+                "'" + data.message + "'" + " Would you like to respond?");
+            if (redirect) {
+                location.href = `/chat/${data.redirect}/`
+            }
+        });
+
+        socket.on('joined', function(data) {
+            console.log(data.sender + " " + data.message);
+        });
+    </script>
+
+{% endblock %}

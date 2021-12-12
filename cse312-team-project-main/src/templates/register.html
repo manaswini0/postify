@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h1>Welcome to Postify, register here!</h1>
+
+    <h2>Register</h2>
+    <form>
+        <div>
+            <label for="uname">Username:</label>
+            <input type="text" name="uname" id="uname" required>
+        </div>
+        <div>
+            <label for="pswd">Password:</label>
+            <input type="password" name="pswd" id="pswd" required>
+        </div>
+
+        <div>
+            <label for="bg">Choose a theme:</label>
+            <select name="bg" id="bg">
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+        </div>
+
+        <div>
+            <button formaction="/auth/register" formmethod="post">Register</button>
+        </div>
+    </form>
+
+{% endblock %}
+

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h1>Hello! Create your post below!</h1>
+
+    <h2>Create Post</h2>
+    <form enctype=multipart/form-data>
+        <div>
+            <label for="Title">Title:</label>
+            <input type="text" name="Title" id="Title" value="{{post['title']}}" required>
+        </div>
+        <div>
+            <label for="Body">Body:</label>
+            <input type="text" name="body" id="body" value="{{post['body']}}" required>
+
+        </div>
+        <div>
+            <label for="form-file">Image: </label>
+            <input name="picture" id="form-file" type="file">
+        </div>
+        <div>
+            <button formaction="/blog/edit_post/{{post['idno']}}" formmethod="post">Edit</button>
+        </div>
+    </form>
+
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"
+integrity="sha384-LzhRnpGmQP+lOvWruF/lgkcqD+WDVt9fU3H4BWmwP5u5LTmkUGafMcpZKNObVMLU"
+crossorigin="anonymous"></script>
+
+    <script>
+        var socket = io.connect();
+        socket.on('connect', function() {
+            socket.emit('join', {
+                user: "{{ session['username'] }}",
+                room: "{{ session['id'] }}"
+            });
+        });
+        socket.on('notif', function(data) {
+            const redirect = confirm("Recived Message from " + data.sender + ": " +
+                                        "'" + data.message + "'" + " Would you like to respond?");
+            if (redirect) {
+                location.href = `/chat/${data.redirect}/`
+            }
+        });
+        socket.on('joined', function(data) {
+            console.log(data.sender + " " + data.message);
+        });
+    </script>
+{% endblock %}

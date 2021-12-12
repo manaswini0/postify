@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h1>Welcome to Postify, login here!</h1>
+
+    <h2>Login</h2>
+    <form>
+        <div>
+            <label for="uname">Username:</label>
+            <input type="text" name="uname" id="uname" required>
+        </div>
+        <div>
+            <label for="pswd">Password:</label>
+            <input type="password" name="pswd" id="pswd" required>
+        </div>
+        <div>
+            <button formaction="/auth/login" formmethod="post">Login</button>
+        </div>
+    </form>
+
+{% endblock %}
+

@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <nav class="home-menu">
+        <a href="../../home">Home</a>
+    </nav>
+
+<h1>Welcome to your chat room with {{ member }} </h1>
+
+<div id="messages"></div>
+
+<form id="form">
+    <input type="text" id="input" placeholder="Send a message!">
+    <button type="submit">Send</button>
+</form>
+
+
+<script src="https://cdn.socket.io/4.0.1/socket.io.min.js"
+integrity="sha384-LzhRnpGmQP+lOvWruF/lgkcqD+WDVt9fU3H4BWmwP5u5LTmkUGafMcpZKNObVMLU"
+crossorigin="anonymous"></script>
+<script>
+    var socket = io();
+
+    var messages = document.getElementById('messages');
+    var form = document.getElementById('form');
+    var input = document.getElementById('input');
+
+    socket.on('connect', function() {
+        socket.emit('join', {
+            user: "{{ session['username'] }}",
+            room: "{{ room }}"
+        });
+        
+        socket.emit('join', {
+            user: "{{ session['username'] }}",
+            room: "{{ session['id'] }}"
+        });
+
+    });
+
+    socket.on('message', function(data) {
+        var item = document.createElement('div');
+        item.innerHTML = (data.sender + ": " + data.message)
+        messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+    });
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        if(input.value) {
+            console.log("{{ mID }}")
+            socket.emit('message', {
+                user: "{{ session['username'] }}",
+                room: "{{ room }}",
+                mID: "{{ mID }}",
+                message: input.value,
+            });
+        }
+        input.value = '';
+        input.focus();
+    });
+
+    window.onbeforeunload = function() {
+        socket.emit('leave', {
+            user: "{{ session['username'] }}",
+            room: "{{ room }}"
+        });
+    }
+
+    socket.on('notif', function(data) {
+        if (location.pathname != `/chat/${data.redirect}/`) {
+                const redirect = confirm("Recived Message from " + data.sender + ": " +
+                                            "'" + data.message + "'." + " Would you like to respond?");
+                if (redirect) {
+                    location.href = `/chat/${data.redirect}/`
+                }
+            }
+        });
+
+    socket.on('joined', function(data) {
+        var item = document.createElement('div');
+        item.innerHTML = (data.sender + " " + data.message)
+        messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+    });
+
+</script>
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <nav class="home-menu">
+        <a href="../home">Home</a>
+    </nav>
+
+<div id="messages"></div>
+
+<form id="form">
+    <input type="text" id="input" placeholder="Send a message!">
+    <button type="submit">Send</button>
+</form>
+
+
+<script src="https://cdn.socket.io/4.0.1/socket.io.min.js"
+integrity="sha384-LzhRnpGmQP+lOvWruF/lgkcqD+WDVt9fU3H4BWmwP5u5LTmkUGafMcpZKNObVMLU"
+crossorigin="anonymous"></script>
+<script>
+    var socket = io();
+
+    var messages = document.getElementById('messages');
+    var form = document.getElementById('form');
+    var input = document.getElementById('input');
+
+    socket.on('connect', function() {
+        socket.emit('join', {
+            username: "{{ session['username'] }}",
+            room: "{{ room }}"
+        });
+    });
+
+    socket.on('message', function(data) {
+        var item = document.createElement('div');
+        item.innerHTML = (data.message)
+        messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+    });
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        if(input.value) {
+            socket.emit('message', {
+                username: "{{ session['username'] }}",
+                room: "{{ room }}",
+                message: input.value
+            });
+        }
+        input.value = '';
+        input.focus();
+    });
+
+    window.onbeforeunload = function() {
+        socket.emit('leave', {
+            username: "{{ session['username'] }}",
+            room: "{{ room }}"
+        });
+    }
+</script>
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

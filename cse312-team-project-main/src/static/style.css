@@ -1,0 +1,28 @@
+body{
+    background-color: #264653;
+}
+
+.post{
+    margin: auto;
+    width: 100%;
+    border: 3px black;
+    padding: 10px;
+    box-shadow: gray;
+}
+
+.home-menu{
+    background-color: lightslategrey;
+    overflow: hidden;
+}
+
+.home-menu a{
+    float: right;
+    color: black;
+    text-align: center;
+    padding: 14px 16px;
+    font-size: 20px;
+}
+
+.home-menu a:hover {
+    color: #dddddd;
+}

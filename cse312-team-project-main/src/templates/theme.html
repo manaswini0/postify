@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Choose your theme here!</h1>
+    <form>
+        <div>
+            <label for="bg">Choose a theme:</label>
+            <select name="bg" id="bg">
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+        </div>
+
+        <div>
+            <button formaction="/change-theme" formmethod="post">Change!</button>
+        </div>
+    </form>
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"
+integrity="sha384-LzhRnpGmQP+lOvWruF/lgkcqD+WDVt9fU3H4BWmwP5u5LTmkUGafMcpZKNObVMLU"
+crossorigin="anonymous"></script>
+    <script>
+        var socket = io.connect();
+        socket.on('connect', function() {
+            socket.emit('join', {
+                user: "{{ session['username'] }}",
+                room: "{{ session['id'] }}"
+            });
+        });
+        socket.on('notif', function(data) {
+                    const redirect = confirm("Recived Message from " + data.sender + ": " +
+                                             "'" + data.message + "'" + " Would you like to respond?");
+                    if (redirect) {
+                        location.href = `/chat/${data.redirect}/`
+                    }
+                });
+        socket.on('joined', function(data) {
+            console.log(data.sender + " " + data.message);
+        });
+    </script>
+{% endblock %}
